@@ -17,7 +17,7 @@ jobs:
       - run: pip install build cyclonedx-bom
       - run: python -m build
       - run: pip install -e . && cyclonedx-py environment -o sbom.cdx.json --of JSON
-      - uses: actions/attest-build-provenance@v1
+      - uses: actions/attest-build-provenance@v4
         with:
           subject-path: dist/*
       - uses: sigstore/gh-action-sigstore-python@v3.5.0
