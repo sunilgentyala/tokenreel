@@ -81,7 +81,8 @@ Or in any MCP client config:
 
 Safety: the client never passes file paths. Output goes to `TOKENREEL_OUT` (default
 `~/tokenreel-output`), one new folder per render, with a restricted file name. Input size and
-scene count are capped. A `Dockerfile` is included for sandboxed use.
+scene count are capped. For sandboxed use there is a container image:
+`docker run -i --rm ghcr.io/sunilgentyala/tokenreel:latest` (MCP over stdio).
 
 ## How it works
 
