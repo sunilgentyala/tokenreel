@@ -84,3 +84,15 @@ def test_mcp_tools_and_limits(tmp_path, monkeypatch):
         m.render_video("hello world", name="../evil")
     with pytest.raises(ValueError):
         m.render_video("hello world", exact_timings=True)
+
+
+def test_mcp_missing_extra_gives_clear_error(monkeypatch):
+    pytest.importorskip("mcp")
+    import importlib.util
+
+    from tokenreel import mcp_server as m
+
+    real = importlib.util.find_spec
+    monkeypatch.setattr(importlib.util, "find_spec", lambda name, *a, **k: None if name == "kokoro_onnx" else real(name, *a, **k))
+    with pytest.raises(RuntimeError, match=r"tokenreel\[tts\]"):
+        m._require_extras(narrate=True, exact_timings=False)

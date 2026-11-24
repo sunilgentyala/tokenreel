@@ -54,6 +54,26 @@ def _out_root() -> Path:
     return root
 
 
+def _require_extras(narrate: bool, exact_timings: bool) -> None:
+    """Fail early with an actionable message instead of a raw ImportError mid-render."""
+    from importlib.util import find_spec
+
+    def need(mod: str, extra: str) -> None:
+        if find_spec(mod) is None:
+            raise RuntimeError(f"this option needs the '{extra}' extra (pip install 'tokenreel[{extra}]'); module {mod} is missing")
+
+    need("PIL", "render")
+    if narrate:
+        need("kokoro_onnx", "tts")
+        need("soundfile", "tts")
+        from . import tts
+
+        if not tts.available():
+            raise RuntimeError(f"Kokoro model files not found in {tts.MODEL_DIR}; see the README")
+    if exact_timings:
+        need("faster_whisper", "align")
+
+
 @mcp.tool()
 def plan_scenes(text: str) -> list[dict]:
     """Split text or Markdown into scenes. Each scene has a kind (text, flow, math, code),
@@ -91,16 +111,21 @@ def render_video(
     scenes = plan(_check(text))
     if len(scenes) > MAX_SCENES:
         raise ValueError(f"too many scenes ({len(scenes)}, max {MAX_SCENES})")
-    if narrate:
-        from . import tts
-
-        if not tts.available():
-            raise RuntimeError(f"Kokoro model files not found in {tts.MODEL_DIR}")
+    _require_extras(narrate, exact_timings)
     from .render import render
 
     workdir = _out_root() / f"{name}-{uuid.uuid4().hex[:8]}"
     mp4, srt = render(scenes, workdir, f"{name}.mp4", audio=narrate, align=exact_timings, burn=burn_captions)
-    return {"video": str(mp4), "captions": str(srt), "scenes": len(scenes), "narrated": narrate}
+    root = _out_root()
+    return {
+        "video": str(mp4),
+        "captions": str(srt),
+        # relative to TOKENREEL_OUT, which is what a host sees when the server runs in a container
+        "video_relative": mp4.relative_to(root).as_posix(),
+        "captions_relative": srt.relative_to(root).as_posix(),
+        "scenes": len(scenes),
+        "narrated": narrate,
+    }
 
 
 def main() -> None:

@@ -81,8 +81,27 @@ Or in any MCP client config:
 
 Safety: the client never passes file paths. Output goes to `TOKENREEL_OUT` (default
 `~/tokenreel-output`), one new folder per render, with a restricted file name. Input size and
-scene count are capped. For sandboxed use there is a container image:
-`docker run -i --rm ghcr.io/sunilgentyala/tokenreel:latest` (MCP over stdio).
+scene count are capped.
+
+### Sandboxed, fully offline (container)
+
+Two images are published to GHCR:
+
+| Image | Can do |
+|---|---|
+| `ghcr.io/sunilgentyala/tokenreel:latest` | plan, captions, silent renders |
+| `ghcr.io/sunilgentyala/tokenreel:narrate` | everything, including narration, exact timings and burned captions (1.6 GB) |
+
+The narration image has the small English recognizer baked in. The voice model
+(`kokoro-v1.0.onnx`, `voices-v1.0.bin`, about 350 MB, see the quick start) is mounted, not baked:
+
+```bash
+claude mcp add tokenreel-sandbox -- docker run -i --rm --network none   -v ~/.tokenreel/models:/home/reel/.tokenreel/models:ro   -v ~/tokenreel-output:/home/reel/out   ghcr.io/sunilgentyala/tokenreel:narrate
+```
+
+`--network none` works: nothing needs the network at run time. Paths returned by
+`render_video` are inside the container, so use `video_relative` and `captions_relative`
+(relative to the mounted output folder).
 
 ## How it works
 
@@ -119,7 +138,7 @@ different number of words than the script, its words are used for the captions a
 
 ## Status and roadmap
 
-Early alpha (v0.1.0). Done: scene planning, flow diagrams, offline narration, exact word
+Early alpha. Done: scene planning, flow diagrams, offline narration, exact word
 timings, burned-in captions. Next: math typesetting, architecture diagrams, more voices and
 languages, a 16:9 layout, per-word caption highlighting.
 

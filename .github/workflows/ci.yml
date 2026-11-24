@@ -34,3 +34,9 @@ jobs:
       - uses: actions/checkout@v4
       - run: docker build -t tokenreel-mcp .
       - run: docker run --rm --entrypoint python tokenreel-mcp -c "import tokenreel.mcp_server as m; print('ok', m.mcp.name)"
+  docker-narrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build --build-arg EXTRAS=mcp,tts,align -t tokenreel-narrate .
+      - run: docker run --rm --entrypoint python tokenreel-narrate -c "import kokoro_onnx, faster_whisper, tokenreel.mcp_server; print('ok')"
