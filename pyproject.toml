@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling>=1.25"]
+build-backend = "hatchling.build"
+
+[project]
+name = "tokenreel"
+version = "0.1.0"
+description = "Turn plain text and technical content into animated, captioned short videos. Offline-first, secure by default."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Sunil Gentyala" }]
+dependencies = []
+
+[project.optional-dependencies]
+nlp = ["spacy>=3.7"]
+tts = ["kokoro-onnx>=0.4.7", "soundfile"]
+align = ["faster-whisper>=1.0", "soundfile", "numpy"]
+render = ["pillow>=10"]
+dev = ["pytest>=8", "ruff>=0.6", "pillow>=10"]
+
+[project.scripts]
+tokenreel = "tokenreel.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tokenreel"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

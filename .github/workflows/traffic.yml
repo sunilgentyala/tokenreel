@@ -1,0 +1,27 @@
+name: traffic-snapshot
+# GitHub keeps 14 days of traffic. This stores a weekly snapshot as a PRIVATE
+# workflow artifact (not committed, not in the README).
+# Needs a repo secret TRAFFIC_TOKEN: a PAT with repo push access.
+on:
+  schedule:
+    - cron: "23 4 * * 1"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - env:
+          GH_TOKEN: ${{ secrets.TRAFFIC_TOKEN }}
+          METRICS_DIR: ${{ runner.temp }}/metrics
+        run: python tools/track_traffic.py "${{ github.repository }}"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: traffic-snapshot
+          path: ${{ runner.temp }}/metrics/snapshots.jsonl
+          retention-days: 90
