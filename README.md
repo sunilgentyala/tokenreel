@@ -33,8 +33,11 @@ TokenReel keeps everything on your machine and is built for technical explainers
 
 ## Quick start
 
+From a clone of this repo (for the example files), or just `pip install tokenreel` and use your own text.
+Contributors: `pip install -e ".[dev]"`.
+
 ```bash
-pip install -e ".[dev]"
+pip install tokenreel
 tokenreel plan examples/demo.md      # scene plan as JSON, no extras needed
 tokenreel srt examples/demo.md       # estimated captions
 ```
@@ -42,7 +45,7 @@ tokenreel srt examples/demo.md       # estimated captions
 Silent preview video (needs [ffmpeg](https://ffmpeg.org) on PATH and the `render` extra):
 
 ```bash
-pip install -e ".[render]"
+pip install "tokenreel[render]"
 tokenreel render examples/demo.md
 ```
 
@@ -50,7 +53,7 @@ Narrated video with captions burned in, each word highlighted as it is spoken
 (`--plain-captions` for static captions):
 
 ```bash
-pip install -e ".[render,tts,align]"
+pip install "tokenreel[render,tts,align]"
 # download kokoro-v1.0.onnx and voices-v1.0.bin (about 350 MB) from the
 # kokoro-onnx "model-files-v1.0" release into ~/.tokenreel/models
 tokenreel render examples/demo.md --audio --align --burn
@@ -64,7 +67,7 @@ TokenReel ships an [MCP](https://modelcontextprotocol.io) server, `tokenreel-mcp
 can plan and render videos for you. It runs locally over stdio.
 
 ```bash
-pip install -e ".[mcp,render]"
+pip install "tokenreel[mcp,render]"
 claude mcp add tokenreel -- tokenreel-mcp        # Claude Code
 ```
 
