@@ -21,6 +21,7 @@ try:  # mcp 2.x
 except ImportError:  # mcp 1.x
     from mcp.server.fastmcp import FastMCP as _Server
 
+from . import __version__
 from .segment import plan
 from .timing import estimate_timings, to_srt
 
@@ -30,6 +31,7 @@ _NAME = re.compile(r"[A-Za-z0-9_-]{1,40}")
 
 mcp = _Server(
     "tokenreel",
+    version=__version__,
     instructions=(
         "Turn text or Markdown into short animated, narrated, captioned videos (1080x1920). "
         "Fenced code blocks become code scenes, 'first, then, finally' sentences become flow "

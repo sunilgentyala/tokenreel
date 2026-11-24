@@ -1,5 +1,9 @@
 FROM python:3.12-slim
 
+LABEL org.opencontainers.image.source="https://github.com/sunilgentyala/tokenreel" \
+      org.opencontainers.image.description="TokenReel MCP server: text to animated, narrated, captioned videos" \
+      org.opencontainers.image.licenses="Apache-2.0"
+
 # ffmpeg for encoding, DejaVu fonts for frame rendering
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg fonts-dejavu-core \

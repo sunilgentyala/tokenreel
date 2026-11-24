@@ -9,6 +9,9 @@ name: publish
 on:
   release:
     types: [published]
+  # releases created by the release workflow use GITHUB_TOKEN and do not fire the trigger
+  # above, so run this manually from the Actions tab after the pypi.org setup
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
