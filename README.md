@@ -46,7 +46,8 @@ pip install -e ".[render]"
 tokenreel render examples/demo.md
 ```
 
-Narrated video with exact captions burned in:
+Narrated video with captions burned in, each word highlighted as it is spoken
+(`--plain-captions` for static captions):
 
 ```bash
 pip install -e ".[render,tts,align]"
@@ -142,8 +143,8 @@ different number of words than the script, its words are used for the captions a
 ## Status and roadmap
 
 Early alpha. Done: scene planning, flow diagrams, offline narration, exact word
-timings, burned-in captions. Next: math typesetting, architecture diagrams, more voices and
-languages, a 16:9 layout, per-word caption highlighting.
+timings, burned-in captions with per-word highlighting. Next: math typesetting, architecture
+diagrams, more voices and languages, a 16:9 layout.
 
 ## License
 

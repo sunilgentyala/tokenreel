@@ -19,7 +19,8 @@ def main(argv=None) -> int:
     r.add_argument("--out", default="build")
     r.add_argument("--audio", action="store_true", help="narrate offline with Kokoro")
     r.add_argument("--align", action="store_true", help="exact word times via faster-whisper (needs --audio)")
-    r.add_argument("--burn", action="store_true", help="burn captions into the video")
+    r.add_argument("--burn", action="store_true", help="burn captions into the video, highlighting each word as it is spoken")
+    r.add_argument("--plain-captions", action="store_true", help="with --burn, use static captions without word highlighting")
     a = ap.parse_args(argv)
     if a.cmd == "plan":
         with open(a.file, encoding="utf-8") as f:
@@ -35,7 +36,7 @@ def main(argv=None) -> int:
         from .render import render
 
         with open(a.file, encoding="utf-8") as f:
-            mp4, srt = render(plan(f.read()), a.out, audio=a.audio, align=a.align, burn=a.burn)
+            mp4, srt = render(plan(f.read()), a.out, audio=a.audio, align=a.align, burn=a.burn, highlight=not a.plain_captions)
             print(mp4, srt, sep="\n")
     return 0
 

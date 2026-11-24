@@ -96,3 +96,18 @@ def test_mcp_missing_extra_gives_clear_error(monkeypatch):
     monkeypatch.setattr(importlib.util, "find_spec", lambda name, *a, **k: None if name == "kokoro_onnx" else real(name, *a, **k))
     with pytest.raises(RuntimeError, match=r"tokenreel\[tts\]"):
         m._require_extras(narrate=True, exact_timings=False)
+
+
+def test_ass_karaoke_timing_and_escaping():
+    from tokenreel.timing import Word, to_ass
+
+    words = [Word("one", 0.0, 0.5), Word("two", 0.6, 1.0), Word(r"{x}\y", 1.0, 1.5)]
+    ass = to_ass(words, per_cue=3)
+    line = next(ln for ln in ass.splitlines() if ln.startswith("Dialogue:"))
+    assert r"{\kf" in line and "PlayResY: 1920" in ass
+    assert "{x}" not in line.split(",,", 1)[1].replace(r"{\kf", "")  # braces and backslashes stripped
+    # karaoke centiseconds add up to the cue length (0.0s to 1.5s = 150cs)
+    import re
+
+    assert sum(int(n) for n in re.findall(r"[\\]kf(\d+)", line)) == 150
+    assert "0:00:00.00,0:00:01.50" in line

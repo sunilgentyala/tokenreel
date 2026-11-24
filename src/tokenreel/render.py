@@ -145,11 +145,12 @@ def scene_durations(scenes: list[Scene]) -> list[float]:
 
 
 def render(scenes: list[Scene], workdir: str | Path, out_name: str = "out.mp4", audio: bool = False,
-           align: bool = False, burn: bool = False):
+           align: bool = False, burn: bool = False, highlight: bool = True):
     """Render scenes to mp4 and captions. With audio=True, narrate offline via Kokoro and
     time scenes and captions to the real clip lengths. align=True refines word times with a local
-    recognizer (faster-whisper); burn=True renders captions into the video. Returns (mp4, srt)."""
-    from .timing import spoken_form, to_srt
+    recognizer (faster-whisper); burn=True renders captions into the video, with each word
+    highlighted as it is spoken unless highlight=False. Returns (mp4, srt)."""
+    from .timing import spoken_form, to_ass, to_srt
 
     work = Path(workdir).resolve()
     work.mkdir(parents=True, exist_ok=True)
@@ -195,10 +196,15 @@ def render(scenes: list[Scene], workdir: str | Path, out_name: str = "out.mp4", 
     srt = work / "captions.srt"
     srt.write_text(to_srt(words), encoding="utf-8")
     vf = "format=yuv420p"
-    if burn:
-        # relative name + cwd=work avoids drive-letter escaping and keeps ffmpeg inside the workdir
+    if burn and highlight:
+        # per-word karaoke fill; relative name + cwd=work keeps ffmpeg inside the workdir
+        (work / "captions.ass").write_text(to_ass(words), encoding="utf-8")
+        # fps first: scene images arrive as one frame per scene, and subtitles are only drawn on
+        # frames the filter actually receives, so without this they would freeze for a whole scene
+        vf = "fps=30,ass=captions.ass,format=yuv420p"
+    elif burn:
         style = "FontName=Segoe UI,Bold=1,Fontsize=9,Outline=1,Shadow=0,MarginV=60,Alignment=2"
-        vf = f"subtitles=captions.srt:original_size=1080x1920:force_style='{style}',format=yuv420p"
+        vf = f"fps=30,subtitles=captions.srt:original_size=1080x1920:force_style='{style}',format=yuv420p"
     cmd += ["-vf", vf, "-r", "30", out_name]
     run(cmd, cwd=work)
     return work / out_name, srt

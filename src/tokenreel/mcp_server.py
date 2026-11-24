@@ -115,12 +115,14 @@ def render_video(
     narrate: bool = False,
     exact_timings: bool = False,
     burn_captions: bool = False,
+    highlight_words: bool = True,
 ) -> dict:
     """Render text to an mp4 plus captions.srt inside the server's output folder.
 
     narrate: offline Kokoro voiceover (needs the model files, see the README).
     exact_timings: align word times with a local recognizer (needs narrate).
     burn_captions: draw captions into the video.
+    highlight_words: with burn_captions, fill each word with an accent colour as it is spoken.
     Returns the output paths. Requires ffmpeg and the render extra."""
     if not _NAME.fullmatch(name):
         raise ValueError("name must be 1-40 characters of letters, digits, '-' or '_'")
@@ -135,7 +137,7 @@ def render_video(
     from .render import render
 
     workdir = _out_root() / f"{name}-{uuid.uuid4().hex[:8]}"
-    mp4, srt = render(scenes, workdir, f"{name}.mp4", audio=narrate, align=exact_timings, burn=burn_captions)
+    mp4, srt = render(scenes, workdir, f"{name}.mp4", audio=narrate, align=exact_timings, burn=burn_captions, highlight=highlight_words)
     root = _out_root()
     return {
         "video": str(mp4),
