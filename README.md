@@ -57,6 +57,32 @@ tokenreel render examples/demo.md --audio --align --burn
 
 Output goes to `build/` as `out.mp4` and `captions.srt`.
 
+## Use it from an AI agent (MCP)
+
+TokenReel ships an [MCP](https://modelcontextprotocol.io) server, `tokenreel-mcp`, so an agent
+can plan and render videos for you. It runs locally over stdio.
+
+```bash
+pip install -e ".[mcp,render]"
+claude mcp add tokenreel -- tokenreel-mcp        # Claude Code
+```
+
+Or in any MCP client config:
+
+```json
+{ "mcpServers": { "tokenreel": { "command": "tokenreel-mcp" } } }
+```
+
+| Tool | What it does |
+|---|---|
+| `plan_scenes` | Split text into scenes (text, flow, math, code) with keywords and flow steps |
+| `make_captions` | Estimated SRT captions |
+| `render_video` | Render an mp4 plus captions, optionally narrated, aligned and burned in |
+
+Safety: the client never passes file paths. Output goes to `TOKENREEL_OUT` (default
+`~/tokenreel-output`), one new folder per render, with a restricted file name. Input size and
+scene count are capped. A `Dockerfile` is included for sandboxed use.
+
 ## How it works
 
 ```

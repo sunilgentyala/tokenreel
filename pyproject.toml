@@ -14,13 +14,15 @@ dependencies = []
 
 [project.optional-dependencies]
 nlp = ["spacy>=3.7"]
+mcp = ["mcp>=1.2", "pillow>=10"]
 tts = ["kokoro-onnx>=0.4.7", "soundfile"]
 align = ["faster-whisper>=1.0", "soundfile", "numpy"]
 render = ["pillow>=10"]
-dev = ["pytest>=8", "ruff>=0.6", "pillow>=10"]
+dev = ["pytest>=8", "ruff>=0.6", "pillow>=10", "mcp>=1.2"]
 
 [project.scripts]
 tokenreel = "tokenreel.cli:main"
+tokenreel-mcp = "tokenreel.mcp_server:main"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/tokenreel"]

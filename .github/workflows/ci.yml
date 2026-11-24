@@ -28,3 +28,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/dependency-review-action@v5
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t tokenreel-mcp .
+      - run: docker run --rm --entrypoint python tokenreel-mcp -c "import tokenreel.mcp_server as m; print('ok', m.mcp.name)"
