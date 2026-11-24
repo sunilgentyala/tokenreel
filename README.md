@@ -96,7 +96,10 @@ The narration image has the small English recognizer baked in. The voice model
 (`kokoro-v1.0.onnx`, `voices-v1.0.bin`, about 350 MB, see the quick start) is mounted, not baked:
 
 ```bash
-claude mcp add tokenreel-sandbox -- docker run -i --rm --network none   -v ~/.tokenreel/models:/home/reel/.tokenreel/models:ro   -v ~/tokenreel-output:/home/reel/out   ghcr.io/sunilgentyala/tokenreel:narrate
+claude mcp add tokenreel-sandbox -- docker run -i --rm --network none \
+  -v ~/.tokenreel/models:/home/reel/.tokenreel/models:ro \
+  -v ~/tokenreel-output:/home/reel/out \
+  ghcr.io/sunilgentyala/tokenreel:narrate
 ```
 
 `--network none` works: nothing needs the network at run time. Paths returned by
