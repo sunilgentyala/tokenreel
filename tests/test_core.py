@@ -78,11 +78,11 @@ def test_mcp_tools_and_limits(tmp_path, monkeypatch):
     names = {t.name for t in asyncio.run(m.mcp.list_tools())}
     assert {"plan_scenes", "make_captions", "render_video"} <= names
     assert m.plan_scenes("First hash the key. Then jump to the bucket.")[0]["kind"] == "flow"
-    with pytest.raises(ValueError):
+    with pytest.raises(m.ToolError):
         m.plan_scenes("x" * (m.MAX_CHARS + 1))
-    with pytest.raises(ValueError):
+    with pytest.raises(m.ToolError):
         m.render_video("hello world", name="../evil")
-    with pytest.raises(ValueError):
+    with pytest.raises(m.ToolError):
         m.render_video("hello world", exact_timings=True)
 
 

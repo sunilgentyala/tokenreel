@@ -9,6 +9,7 @@ short allow-listed charset. Input size and scene count are capped. Everything ru
 """
 from __future__ import annotations
 
+import functools
 import os
 import re
 import shutil
@@ -18,8 +19,10 @@ from pathlib import Path
 
 try:  # mcp 2.x
     from mcp.server.mcpserver import MCPServer as _Server
+    from mcp.server.mcpserver.exceptions import ToolError
 except ImportError:  # mcp 1.x
     from mcp.server.fastmcp import FastMCP as _Server
+    from mcp.server.fastmcp.exceptions import ToolError
 
 from . import __version__
 from .segment import plan
@@ -38,6 +41,20 @@ mcp = _Server(
         "diagrams, equations become math cards. Use plan_scenes to preview, render_video to produce an mp4."
     ),
 )
+
+
+def _friendly(fn):
+    """Show anticipated failures to the agent. Only ToolError messages reach the client;
+    any other exception becomes the opaque 'Error executing tool'."""
+
+    @functools.wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except (ValueError, RuntimeError) as exc:
+            raise ToolError(str(exc)) from exc
+
+    return wrapper
 
 
 def _check(text: str) -> str:
@@ -75,6 +92,7 @@ def _require_extras(narrate: bool, exact_timings: bool) -> None:
 
 
 @mcp.tool()
+@_friendly
 def plan_scenes(text: str) -> list[dict]:
     """Split text or Markdown into scenes. Each scene has a kind (text, flow, math, code),
     its text, keywords and, for flow scenes, numbered steps. No files are written."""
@@ -83,12 +101,14 @@ def plan_scenes(text: str) -> list[dict]:
 
 
 @mcp.tool()
+@_friendly
 def make_captions(text: str) -> str:
     """Return estimated SRT captions for the text. For exact timings render with narration."""
     return to_srt(estimate_timings(_check(text)))
 
 
 @mcp.tool()
+@_friendly
 def render_video(
     text: str,
     name: str = "video",
